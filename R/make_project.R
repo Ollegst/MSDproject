@@ -57,15 +57,15 @@ file.copy2 <- function(from, to, overwrite = FALSE, recursive = FALSE){
 #'   user R package library from .libPaths()
 #' @param overwrite_rprofile logical. should project .Rprofile be overwritten (default=FALSE)
 #' @export
-make_project <- function(proj_name, keep_readme_file = TRUE, remove_user_lib = TRUE,
-                         overwrite_rprofile = TRUE) {
-  ## must be full path.  User function: create new_project
+make_project <- function (proj_name, keep_readme_file = TRUE, remove_user_lib = TRUE, 
+                          overwrite_rprofile = TRUE) 
+{
   new_proj <- !file.exists(proj_name)
   if (new_proj) {
     tryCatch({
       message("Directory doesn't exist. Creating...")
       dir.create(proj_name)
-      copy_empty_project(proj_name=proj_name,remove_user_lib=remove_user_lib,
+      copy_empty_project(proj_name = proj_name, remove_user_lib = remove_user_lib, 
                          overwrite_rprofile = overwrite_rprofile)
       if (!TRUE %in% file.info(proj_name)$isdir) 
         stop(paste(proj_name, "not created"))
@@ -73,37 +73,38 @@ make_project <- function(proj_name, keep_readme_file = TRUE, remove_user_lib = T
       message("Aborting. Reversing changes...")
       unlink(proj_name, recursive = TRUE, force = TRUE)
       stop(e)
-    })}else{
+    })
+  }
+  else {
     message("Directory exists. Merging...")
-    ## find common files that wont be overwritten.
-    all_templates <- dir(system.file("extdata/EmptyProject", package = "MSDproject"), 
-                         include.dirs = TRUE, all.files = TRUE, recursive = TRUE)
-    all_existing <- dir(proj_name, include.dirs = TRUE, all.files = TRUE, recursive = TRUE)
-    
+    all_templates <- dir(system.file("extdata/EmptyProject", 
+                                     package = "MSDproject"), include.dirs = TRUE, all.files = TRUE, 
+                         recursive = TRUE)
+    all_existing <- dir(proj_name, include.dirs = TRUE, all.files = TRUE, 
+                        recursive = TRUE)
     merge_conf <- intersect(all_templates, all_existing)
     message("\n---Merge conflict on files/folders (will not replace)---:\n")
     message(paste(merge_conf, collapse = "\n"))
     message("")
-    copy_empty_project(proj_name=proj_name,remove_user_lib=remove_user_lib)
-    }
-  if (is.null(getOption("git.exists"))) 
-    options(git.exists = requireNamespace("git2r", quietly = TRUE))
+    copy_empty_project(proj_name = proj_name, remove_user_lib = remove_user_lib)
+  }
   if (getOption("git.exists")) {
     currentwd <- getwd()
     on.exit(setwd(currentwd))
     setwd(proj_name)
-    bare_proj_name <- gsub(basename(proj_name), paste0(basename(proj_name), ".git"), 
-                           proj_name)
+    bare_proj_name <- gsub(basename(proj_name), paste0(basename(proj_name), 
+                                                       ".git"), proj_name)
     tryCatch({
       r <- git2r::init(".")
       if (!file.exists(".gitignore")) {
-        s <- unique(c(".Rproj.user", ".Rhistory", ".RData", getOption("git.ignore.files")))
+        s <- unique(c(".Rproj.user", ".Rhistory", ".RData", 
+                      getOption("git.ignore.files")))
         write(s, ".gitignore")
       }
       paths <- unlist(git2r::status(r))
       if (length(git2r::reflog(r)) == 0) {
         git2r::add(r, paths)
-        git2r::config(r, user.name = Sys.info()["user"], user.email = getOption("user.email"))
+        git2r::config(r, user.name = Sys.info()["user"])
         git2r::commit(r, "initialise_repository")
       }
     }, error = function(e) {
@@ -116,22 +117,19 @@ make_project <- function(proj_name, keep_readme_file = TRUE, remove_user_lib = T
       stop(e)
     })
   }
- 
-    if (keep_readme_file == FALSE) {
-      unlink("./DerivedData/Readme.txt", recursive = FALSE)
-      unlink("./Models/Readme.txt", recursive = FALSE)
-      unlink("./Results/Readme.txt", recursive = FALSE)
-      unlink("./Scripts/Readme.txt", recursive = FALSE)
-      unlink("./SourceData/Readme.txt", recursive = FALSE)
-    }
-
-    message(paste("MSDproject directory ready:", proj_name))
-    message("----------------------------------------------------")
-    message("")
-    message("INSTRUCTIONS:")
-    message(paste("1. Open Rstudio project to start working: ", proj_name))
-   
-
+  if (keep_readme_file == FALSE) {
+    unlink("./DerivedData/Readme.txt", recursive = FALSE)
+    unlink("./Models/Readme.txt", recursive = FALSE)
+    unlink("./Results/Readme.txt", recursive = FALSE)
+    unlink("./Scripts/Readme.txt", recursive = FALSE)
+    unlink("./SourceData/Readme.txt", recursive = FALSE)
+  }
+  message(paste("MSDproject directory ready:", proj_name))
+  message("----------------------------------------------------")
+  message("")
+  message("INSTRUCTIONS:")
+  message(paste("1. Open Rstudio project to start working: ", 
+                proj_name))
 }
 
 #' create local bare repository
