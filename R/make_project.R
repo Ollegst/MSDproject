@@ -85,7 +85,9 @@ make_project <- function(proj_name, keep_readme_file = TRUE, remove_user_lib = T
     message(paste(merge_conf, collapse = "\n"))
     message("")
     copy_empty_project(proj_name=proj_name,remove_user_lib=remove_user_lib)
-  }
+    }
+  if (is.null(getOption("git.exists"))) 
+    options(git.exists = requireNamespace("git2r", quietly = TRUE))
   if (getOption("git.exists")) {
     currentwd <- getwd()
     on.exit(setwd(currentwd))
