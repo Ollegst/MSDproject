@@ -16,13 +16,9 @@ Renvironment_info <- function() {
     }
     text <- unlist(text)
     text <- parse(text = text)
-
-    pkgs <- unique(unlist(lapply(text,recursive_lib_find)))
-
+    packrat::snapshot()
     txt <- c(paste0("Created at ", Sys.time(), " by ", Sys.info()["user"], "\n"))
-    if(length(pkgs)>0) txt <- c(txt, utils::capture.output(utils::sessionInfo(package = pkgs))) else
-      txt <- c(txt, utils::capture.output(utils::sessionInfo()))
-
+    txt <- c(txt, utils::capture.output(utils::sessionInfo()))
     writeLines(txt, "Renvironment_info.txt")
     MSDproject::setup_file("Renvironment_info.txt")
     message(paste0("Environment info produced: Renvironment_info.txt"))

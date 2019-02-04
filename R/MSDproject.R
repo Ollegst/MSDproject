@@ -226,11 +226,10 @@ check_session <- function(proj_name = getwd(), silent = FALSE, check_rstudio = T
                           return(TRUE)
                         paste0(result, ": ", signif(time_diff, 2), " ", attr(time_diff, "units"))
                       }, "Project library setup" = {
-                        if (file.exists(file.path(proj_name, "ProjectLibrary"))) {
-                          res <- normalizePath(file.path(proj_name, "ProjectLibrary"), winslash = "/") == 
-                            normalizePath(.libPaths()[1], winslash = "/")
-                          return(res)
-                        } else return(paste0(FALSE, ": no project library"))
+                        if (file.exists(file.path(proj_name, "packrat"))) {
+                            return("Project Library configured")
+                                          
+                         } else return(paste0(FALSE, ": no project library"))
                       }, "Description fields present" = {
                         field_val_test("Description")
                       }, "Author fields present" = {
