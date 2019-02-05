@@ -112,9 +112,9 @@ resetwd <- function(){
 #' @param file_name character. Indicating name of file to set up
 #' @param version_control logical. Should file be added to version control
 #' @export
+
 setup_file <- function(file_name,version_control=getOption("git.exists")) {
   check_if_MSDproject()
-  Sys.chmod(file_name, mode = "744")  ## 744= read-write-executable for user, read only for others
   if (version_control) {
     commit_file(file_name)
     Sys.sleep(0.1)
@@ -162,17 +162,12 @@ commit_file <- function(file_name){
   git2r::commit(repo,message = paste("snapshot:", paste(file_name, collapse = ",")))
 }
 
-#' system/shell command wrapper
-#'
-#' @param cmd character. command to send to shell
-#' @param dir character. directory to run command in
-#' @param ... other arguments passed to system command
-#' @export
 system_cmd <- function(cmd,dir=".",...){
   if(!dir %in% ".") if(file.exists(dir)) {currentwd <- getwd(); setwd(dir) ; on.exit(setwd(currentwd))} else
     stop(paste0("Directory \"",dir,"\" doesn't exist."))
   getOption("system_cmd")(cmd,...)
 }
+
 
 #' Test if full path
 #'
@@ -275,12 +270,7 @@ get_script_field <- function(file_name,field_name,n = 10){
   field
 }
 
-#' Testing interfact
-#' 
-#' @param ... named expression to evaluate
-#' @param silent logical. Default = FALSE. Should messages be printed.
-#' @param append data.frame. Default = empty. Existing set of results to append to
-#' @export
+
 do_test <- function(..., silent = FALSE,append=data.frame()) {
   x <- match.call(expand.dots = FALSE)$...
   par_env <- parent.frame()
@@ -307,24 +297,6 @@ do_test <- function(..., silent = FALSE,append=data.frame()) {
   d <- rbind(append,d)
   invisible(d)
 }
-
-#' Wait for statement to be true
-#'
-#' @param x expression to evaluate
-#' @param timeout numeric. Maximum time (seconds) to wait
-#' @param interval numeric. Number of seconds (default=1s) to wait till rechecking
-#' @export
-wait_for <- function(x,timeout=NULL,interval=1){
-  x <- substitute(x)
-  start.time <- Sys.time()
-  diff.time <- 0
-  while (!eval(x,envir = parent.frame())){
-    diff.time <- difftime(Sys.time(),start.time,units="secs")
-    if(!is.null(timeout))if(diff.time > timeout) stop(paste("timed out waiting for\n",x,sep=""))
-    Sys.sleep(1)
-  }
-}
-
 #' Logical flag for detecting if R session is on rstudio not
 #' @export
 is_rstudio <- function() Sys.getenv("RSTUDIO") == "1"
@@ -336,39 +308,3 @@ is_rstudio <- function() Sys.getenv("RSTUDIO") == "1"
 #' @param ... additional arguments for git2r::commit
 #' @export
 
-snapshot2 <- function(message = "created automatic snapshot", session = TRUE, ...){
-  
-  files_to_stage <- c(file.path(getOption("scripts.dir"),"*"),
-                       file.path("SourceData","*"))
-  
-  code_snapshot_files(message = message, session = session, files_to_stage = files_to_stage, ...)
-  
-}
-
-#' Git commit of ctl files, SourceData and Scripts
-#'
-#' This function should not be used directly.
-#' 
-#' @param message character. Description to be added to commit
-#' @param session logical. Should sessionInfo be included in commit message
-#' @param files_to_stage character vector. file paths to add to commit
-#' @param ... additional arguments for git2r::commit
-#' @export
-
-code_snapshot_files <- function(message = "created automatic snapshot", session = TRUE, files_to_stage, ...){
-  
-  ## 'all' doesn't seem to work in git2r::commit, so add the 
-  repo <- git2r::repository(".")
-  git2r::add(repo, files_to_stage)
-  
-  files <- git2r::status(repo)
-  new_unstaged_files <- unlist(files$unstaged)
-  new_staged_files <- unlist(files$staged)
-  
-  if(length(c(new_staged_files,new_unstaged_files)) == 0){
-    message("nothing to commit")
-    return(invisible())
-  }
-  git2r::commit(repo, message = message, all = TRUE, session = session, ...)
-  message("Committed changes to: ctl files, scripts, and source data")
-}
