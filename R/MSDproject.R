@@ -227,8 +227,12 @@ check_session <- function(proj_name = getwd(), silent = FALSE, check_rstudio = T
                         paste0(result, ": ", signif(time_diff, 2), " ", attr(time_diff, "units"))
                       }, "Project library setup" = {
                         if (file.exists(file.path(proj_name, "packrat"))) {
-                            return("Project Library configured")
-                                          
+                          project_library <- packrat::status()
+                          if(sum(is.na(project_library)) > 0) {
+                            return("Please run packrat::snapshot()")
+                          } else{
+                            return("Project Library is up to date")
+                          }
                          } else return(paste0(FALSE, ": no project library"))
                       }, "Description fields present" = {
                         field_val_test("Description")
