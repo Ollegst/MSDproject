@@ -223,6 +223,7 @@ check_session <- function(proj_name = getwd(), silent = FALSE, check_rstudio = T
                       }, "Project library setup" = {
                         if (file.exists(file.path(proj_name, "packrat"))) {
                           project_library <- packrat::status()
+                          project_library <- project_library[!(project_library$package == "IQRtools"), ]
                           if(sum(is.na(project_library)) > 0) {
                             return("Please run packrat::snapshot()")
                           } else{
