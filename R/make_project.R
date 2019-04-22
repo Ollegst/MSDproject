@@ -151,3 +151,4 @@ make_local_bare <- function(proj_name = getwd()) {
     res <- unlink(proj_name_full, recursive = TRUE, force = TRUE)
     git2r::clone(bare_proj_name_full, proj_name_full)
 }
+

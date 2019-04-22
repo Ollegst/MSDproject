@@ -339,3 +339,4 @@ pull_repo <- function(local_path){
   git2r::config(repo,user.name = Sys.info()["user"],user.email = getOption("user.email"))
   git2r::pull(repo)
 }
+
