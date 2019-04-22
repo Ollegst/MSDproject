@@ -152,3 +152,5 @@ make_local_bare <- function(proj_name = getwd()) {
     git2r::clone(bare_proj_name_full, proj_name_full)
 }
 
+
+
