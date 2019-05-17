@@ -1,7 +1,7 @@
 Package: MSDproject
 Type: Package
 Title: Project and Code Management
-Version: 0.1.56
+Version: 0.1.57
 Authors@R: person("Oleg", "Stepanov", email =
     "oleg.stepanov@msdecisions.ru", role = c("aut", "cre"))
 Maintainer: Oleg Stepanov <oleg.stepanov@msdecisions.ru>
